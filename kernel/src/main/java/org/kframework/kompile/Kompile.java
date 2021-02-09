@@ -2,22 +2,21 @@
 package org.kframework.kompile;
 
 import com.google.inject.Inject;
-import org.kframework.Strategy;
 import org.kframework.attributes.Att;
 import org.kframework.attributes.Source;
 import org.kframework.backend.Backends;
 import org.kframework.builtin.Sorts;
 import org.kframework.compile.*;
-import org.kframework.compile.checks.CheckAtt;
 import org.kframework.compile.checks.CheckAnonymous;
+import org.kframework.compile.checks.CheckAtt;
 import org.kframework.compile.checks.CheckConfigurationCells;
 import org.kframework.compile.checks.CheckFunctions;
 import org.kframework.compile.checks.CheckHOLE;
 import org.kframework.compile.checks.CheckK;
 import org.kframework.compile.checks.CheckKLabels;
 import org.kframework.compile.checks.CheckLabels;
-import org.kframework.compile.checks.CheckRHSVariables;
 import org.kframework.compile.checks.CheckRewrite;
+import org.kframework.compile.checks.CheckRHSVariables;
 import org.kframework.compile.checks.CheckSortTopUniqueness;
 import org.kframework.compile.checks.CheckStreams;
 import org.kframework.definition.*;
@@ -27,19 +26,21 @@ import org.kframework.definition.Rule;
 import org.kframework.definition.Sentence;
 import org.kframework.kore.KLabel;
 import org.kframework.kore.Sort;
+import org.kframework.parser.inner.generator.RuleGrammarGenerator;
 import org.kframework.parser.InputModes;
 import org.kframework.parser.KRead;
 import org.kframework.parser.ParserUtils;
-import org.kframework.parser.inner.generator.RuleGrammarGenerator;
+import org.kframework.Strategy;
 import org.kframework.unparser.ToJson;
-import org.kframework.utils.Stopwatch;
-import org.kframework.utils.StringUtil;
+import org.kframework.unparser.ToLatex;
 import org.kframework.utils.errorsystem.KEMException;
 import org.kframework.utils.errorsystem.KException;
 import org.kframework.utils.errorsystem.KException.ExceptionType;
 import org.kframework.utils.errorsystem.KExceptionManager;
 import org.kframework.utils.file.FileUtil;
 import org.kframework.utils.file.JarInfo;
+import org.kframework.utils.Stopwatch;
+import org.kframework.utils.StringUtil;
 import scala.Function1;
 import scala.Option;
 
@@ -146,6 +147,15 @@ public class Kompile {
                 files.saveToKompiled("compiled.json", new String(ToJson.apply(kompiledDefinition), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 throw KEMException.criticalError("Unsupported encoding `UTF-8` when saving JSON definition.");
+            }
+        }
+
+        if (kompileOptions.experimental.emitLatexPrelude) {
+            try {
+                files.saveToKompiled("parsed.tex",   new String(ToLatex.makePrelude(parsedDef.mainModule()),          "UTF-8"));
+                files.saveToKompiled("compiled.tex", new String(ToLatex.makePrelude(kompiledDefinition.mainModule()), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw KEMException.criticalError("Unsupported encoding `UTF-8` when saving LaTeX definition.");
             }
         }
 

@@ -2,6 +2,11 @@
 package org.kframework.unparser;
 
 import org.kframework.attributes.Att;
+import org.kframework.definition.Module;
+import org.kframework.definition.NonTerminal;
+import org.kframework.definition.Production;
+import org.kframework.definition.ProductionItem;
+import org.kframework.definition.Terminal;
 import org.kframework.kore.InjectedKLabel;
 import org.kframework.kore.K;
 import org.kframework.kore.KApply;
@@ -22,6 +27,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import scala.collection.JavaConverters;
+
 /**
  * Writes a KAST term to the LaTeX format.
  */
@@ -34,6 +41,16 @@ public class ToLatex {
             return out.toByteArray();
         } catch (IOException e) {
             throw KEMException.criticalError("Could not write K term to LaTeX", e, k);
+        }
+    }
+
+    public static byte[] makePrelude(Module mod) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            makePrelude(new DataOutputStream(out), mod);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw KEMException.criticalError("Could not write LaTeX prelude for K module " + mod.name(), e);
         }
     }
 
@@ -51,6 +68,16 @@ public class ToLatex {
         latexEncoder[0x39] = "IX";
         latexEncoder[0x7a] = "ActZ";
         return latexEncoder;
+    }
+
+    private static String escapeLatex(String input) {
+        return input.replace("&", "\\&")
+                    .replace("%", "\\%")
+                    .replace("$", "\\$")
+                    .replace("#", "\\#")
+                    .replace("_", "\\_")
+                    .replace("{", "\\{")
+                    .replace("}", "\\}");
     }
 
     public static final Pattern identChar = Pattern.compile("[A-Za-y]");
@@ -140,6 +167,33 @@ public class ToLatex {
 
         } else {
             throw KEMException.criticalError("Unimplemented for LaTeX serialization: ", k);
+        }
+    }
+
+    public static void makePrelude(DataOutputStream out, Module mod) throws IOException {
+        for (Production p: JavaConverters.setAsJavaSet(mod.productions())) {
+            if (! p.isSyntacticSubsort() && ! p.klabel().isEmpty() && ! p.att().contains("unparseAvoid")) {
+                String arity      = Integer.toString(p.arity());
+                String command    = latexedKLabel(p.klabel().get().name());
+                String format     = "";
+                String identifier = p.klabel().get().name(); // Include source info?
+                if (p.att().contains("latex")) {
+                    format = p.att().get("latex");
+                } else {
+                    int nonTerminal = 1;
+                    for (ProductionItem pItem: JavaConverters.seqAsJavaList(p.items())) {
+                        if (pItem instanceof Terminal) {
+                            format += "\\mathtt{" + escapeLatex(((Terminal) pItem).value()) + "}";
+                        }
+                        if (pItem instanceof NonTerminal) {
+                            format += "{#" + Integer.toString(nonTerminal) + "}";
+                            nonTerminal++;
+                        }
+                    }
+                }
+                String newcommand = String.format("%-" + 120 + "s", "\n\\newcommand{\\" + command + "}[" + arity + "]{" + format + "}");
+                writeString(out, newcommand + " % " + identifier);
+            }
         }
     }
 }

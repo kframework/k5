@@ -134,6 +134,9 @@ public class KompileOptions implements Serializable {
         @Parameter(names="--emit-json", description="Emit JSON serialized version of parsed and kompiled definitions.")
         public boolean emitJson = false;
 
+        @Parameter(names="--emit-latex-prelude", description="Emit LaTeX prelude for definition.")
+        public boolean emitLatexPrelude = false;
+
         @Parameter(names="--gen-bison-parser", description="Emit bison parser for the PGM configuration variable within the syntax module of your definition into the kompiled definition.")
         public boolean genBisonParser;
 

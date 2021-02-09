@@ -87,7 +87,7 @@ module KAST
 
   syntax KList ::= K
                  | ".KList"          [klabel(#EmptyKList), symbol]
-                 | ".::KList"        [klabel(#EmptyKList), symbol]
+                 | ".::KList"        [klabel(#EmptyKList), symbol, unparseAvoid]
                  | KList "," KList   [klabel(#KList), left, assoc, unit(#EmptyKList), symbol, prefer]
 endmodule
 

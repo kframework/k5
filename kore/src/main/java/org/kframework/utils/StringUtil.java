@@ -686,7 +686,7 @@ public class StringUtil {
             }
         }
         if (!inIdent) {
-            sb.append("'");
+            sb.append(escapeChar);
         }
     }
 
