@@ -214,7 +214,7 @@ public class InitializeRewriter implements Function<org.kframework.definition.De
         }
 
         @Override
-        public RewriterResult prove(Module specModule, @Nullable Rule boundaryPattern) {
+        public RewriterResult prove(Module specModule, @Nullable Rule boundaryPattern, Boolean reuseDef) {
             rewritingContext.stateLog.open("prove-" + Integer.toString(Math.abs(specModule.hashCode())));
             rewritingContext.setExecutionPhase(false);
 
