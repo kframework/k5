@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.kframework.Collections.*;
+
 /**
  * @author Denis Bogdanas
  * Created on 07-Nov-19.
@@ -66,21 +68,28 @@ public class ProofDefinitionBuilder {
                 specModuleName == null ? FilenameUtils.getBaseName(specFile.getName()).toUpperCase() : specModuleName;
         File absSpecFile = files.resolveWorkingDirectory(specFile).getAbsoluteFile();
 
-        Set<Module> modules = kompile.parseModules(compiledDefinition, defModuleNameUpdated, specModuleNameUpdated, absSpecFile,
-                backend.excludedModuleTags(), readOnlyCache);
+        cache.put(compiledDefinition.getParsedDefinition(), compiledDefinition.kompiledDefinition);
+
+        Set<Module> modules = kompile.parseModules(mutable(compiledDefinition.getParsedDefinition().modules()),
+                defModuleNameUpdated,specModuleNameUpdated,absSpecFile,backend.excludedModuleTags(), readOnlyCache);
         Map<String, Module> modulesMap = modules.stream().collect(Collectors.toMap(Module::name, m -> m));
         Definition parsedDefinition = compiledDefinition.getParsedDefinition();
         Module specModule = getModule(specModuleNameUpdated, modulesMap, parsedDefinition);
         specModule = kompile.proverChecks(specModule, modulesMap.get(defModuleNameUpdated));
-        kompile.structuralChecks(scala.collection.JavaConverters.asScalaSet(modules),
-                specModule, scala.Option.empty(), backend.excludedModuleTags());
+        kompile.structuralChecks(immutable(modules),specModule, scala.Option.empty(), backend.excludedModuleTags());
         Module defModule = getModule(defModuleNameUpdated, modulesMap, parsedDefinition);
-        Definition rawExtendedDef = Definition.apply(defModule, parsedDefinition.entryModules(),
-                parsedDefinition.att());
+        final Module specModuleFinal = specModule;
+        // clear the definition of the spec module (try to see if it matches any saved kompiled definition)
+        Set<Module> modules3 = modules.stream().filter(m ->
+                m.name().equals(defModuleNameUpdated)
+                || !(m.name().equals(specModuleFinal.name())
+                        || (specModuleFinal.importedModuleNames().contains(m.name())
+                        && !defModule.importedModuleNames().contains(m.name())))).collect(Collectors.toSet());
+        Definition rawExtendedDef = Definition.apply(defModule, immutable(modules3), parsedDefinition.att());
         Definition compiledExtendedDef = compileDefinition(backend, rawExtendedDef); //also resolves imports
         compiledExtendedDef = backend.proofDefinitionNonCachedSteps(extraConcreteRuleLabels).apply(compiledExtendedDef);
 
-        specModule = backend.specificationSteps(compiledDefinition.kompiledDefinition).apply(specModule);
+        specModule = backend.specificationSteps(compiledExtendedDef).apply(specModule);
 
         return Tuple2.apply(compiledExtendedDef, specModule);
     }

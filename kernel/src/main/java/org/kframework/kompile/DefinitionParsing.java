@@ -115,10 +115,10 @@ public class DefinitionParsing {
         this.sw = sw;
     }
 
-    public java.util.Set<Module> parseModules(CompiledDefinition definition, String mainModule, String entryPointModule, File definitionFile, java.util.Set<String> excludeModules, boolean readOnlyCache) {
+    public java.util.Set<Module> parseModules(java.util.Set<Module> previousModules, String mainModule, String entryPointModule, File definitionFile, java.util.Set<String> excludeModules, boolean readOnlyCache) {
         Definition def = parser.loadDefinition(
                 mainModule,
-                mutable(definition.getParsedDefinition().modules()),
+                previousModules,
                 FileUtil.load(definitionFile),
                 Source.apply(definitionFile.getAbsolutePath()),
                 definitionFile.getParentFile(),
@@ -138,8 +138,18 @@ public class DefinitionParsing {
         modules = Stream.concat(modules, stream(def.getModule(mainModule).get().importedModules()));
         modules = Stream.concat(modules, Stream.of(def.getModule(entryPointModule).get()));
         modules = Stream.concat(modules, stream(def.getModule(entryPointModule).get().importedModules()));
-        modules = Stream.concat(modules,
-                stream(def.entryModules()).filter(m -> stream(m.sentences()).noneMatch(s -> s instanceof Bubble)));
+        modules = Stream.concat(modules, Stream.of(def.getModule("K-REFLECTION").get()));
+        modules = Stream.concat(modules, Stream.of(def.getModule("STDIN-STREAM").get()));
+        modules = Stream.concat(modules, Stream.of(def.getModule("STDOUT-STREAM").get()));
+        modules = Stream.concat(modules, Stream.of(def.getModule("MAP").get()));
+        // include modules from kast.md. We can easily find them because they will have no non-Syntax sentences
+        modules = Stream.concat(modules, stream(def.entryModules()).filter(m -> stream(m.sentences())
+                .noneMatch(s -> s instanceof Bubble
+                             || s instanceof Rule
+                             || s instanceof Claim
+                             || s instanceof Configuration
+                             || s instanceof Context
+                             || s instanceof ContextAlias)));
         def = Definition(def.mainModule(), modules.collect(Collections.toSet()), def.att());
 
         def = Kompile.excludeModulesByTag(excludeModules).apply(def);
@@ -196,8 +206,14 @@ public class DefinitionParsing {
         modules = Stream.concat(modules, Stream.of(parsedDefinition.getModule("STDIN-STREAM").get()));
         modules = Stream.concat(modules, Stream.of(parsedDefinition.getModule("STDOUT-STREAM").get()));
         modules = Stream.concat(modules, Stream.of(parsedDefinition.getModule("MAP").get()));
-        modules = Stream.concat(modules,
-                stream(parsedDefinition.entryModules()).filter(m -> stream(m.sentences()).noneMatch(s -> s instanceof Bubble)));
+        // include modules from kast.md. We can easily find them because they will have no non-Syntax sentences
+        modules = Stream.concat(modules, stream(parsedDefinition.entryModules()).filter(m -> stream(m.sentences())
+                .noneMatch(s -> s instanceof Bubble
+                        || s instanceof Rule
+                        || s instanceof Claim
+                        || s instanceof Configuration
+                        || s instanceof Context
+                        || s instanceof ContextAlias)));
         Definition trimmed = Definition(parsedDefinition.mainModule(), modules.collect(Collections.toSet()),
                 parsedDefinition.att());
         trimmed = Kompile.excludeModulesByTag(excludedModuleTags).apply(trimmed);

@@ -469,12 +469,8 @@ public class Kompile {
                 .apply(parsedRule);
     }
 
-    public Set<Module> parseModules(CompiledDefinition definition, String mainModule, String entryPointModule, File definitionFile, Set<String> excludeModules) {
-        return parseModules(definition, mainModule, entryPointModule, definitionFile, excludeModules, false);
-    }
-
-    public Set<Module> parseModules(CompiledDefinition definition, String mainModule, String entryPointModule, File definitionFile, Set<String> excludeModules, boolean readOnlyCache) {
-        Set<Module> modules = definitionParsing.parseModules(definition, mainModule, entryPointModule, definitionFile, excludeModules, readOnlyCache);
+    public Set<Module> parseModules(java.util.Set<Module> previousModules, String mainModule, String entryPointModule, File definitionFile, Set<String> excludeModules, boolean readOnlyCache) {
+        Set<Module> modules = definitionParsing.parseModules(previousModules, mainModule, entryPointModule, definitionFile, excludeModules, readOnlyCache);
         int totalBubbles = definitionParsing.parsedBubbles.get() + definitionParsing.cachedBubbles.get();
         sw.printIntermediate("Parse spec modules [" + definitionParsing.parsedBubbles.get() + "/" + totalBubbles + " rules]");
         return modules;
