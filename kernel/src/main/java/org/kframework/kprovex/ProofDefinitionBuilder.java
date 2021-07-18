@@ -50,7 +50,7 @@ public class ProofDefinitionBuilder {
         Map<String, Module> modulesMap = modules.stream().collect(Collectors.toMap(Module::name, m -> m));
         Definition parsedDefinition = compiledDefinition.getParsedDefinition();
         Module specModule = getModule(specModuleNameUpdated, modulesMap, parsedDefinition);
-        specModule = kompile.proverChecks(specModule, modulesMap.get(defModuleNameUpdated));
+        kompile.proverChecksX(specModule, modulesMap.get(defModuleNameUpdated));
         kompile.structuralChecks(immutable(modules), specModule, Option.empty(), backend.excludedModuleTags());
         specModule = backend.specificationSteps(compiledDefinition.kompiledDefinition).apply(specModule);
 
