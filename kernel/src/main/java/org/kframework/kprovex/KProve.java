@@ -18,17 +18,9 @@ import org.kframework.utils.errorsystem.KExceptionManager;
 import org.kframework.utils.file.FileUtil;
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.Function;
 
-
-/**
- * Class that implements the "--prove" option.
- */
 public class KProve {
 
     public static final String BOUNDARY_CELL_PREFIX = "BOUND_";
@@ -63,11 +55,7 @@ public class KProve {
         }
 
         Tuple2<Definition, Module> compiled = proofDefinitionBuilder
-                .build(kproveOptions.specFile(files), kproveOptions.defModule, kproveOptions.specModule, compiledDefinition.kompileOptions.readOnlyKompiledDirectory);
-
-        if (kproveOptions.saveProofDefinitionTo != null) {
-            saveFullDefinition(compiled._1());
-        }
+                .build(kproveOptions.specFile(files), kproveOptions.specModule, compiledDefinition.kompileOptions.readOnlyKompiledDirectory);
 
         Rewriter rewriter = rewriterGenerator.apply(compiled._1());
         Module specModule = compiled._2();
@@ -85,22 +73,6 @@ public class KProve {
         kprint.prettyPrint(compiled._1(), compiled._1().getModule("LANGUAGE-PARSING").get(), kprint::outputFile,
                 results.k());
         return results.exitCode().orElse(KEMException.TERMINATED_WITH_ERRORS_EXIT_CODE);
-    }
-
-    // Saving combined verification definition to disk to be usable by other tools (e.g., kast)
-    private void saveFullDefinition(Definition fullDefinition) {
-        CompiledDefinition fullCompiledDefinition = new CompiledDefinition(
-                compiledDefinition.kompileOptions,
-                fullDefinition, fullDefinition,
-                files, kem, compiledDefinition.topCellInitializer);
-        Path proveKompiledDir = Paths.get(kproveOptions.saveProofDefinitionTo).resolve("prove-spec-kompiled");
-        try {
-            Files.createDirectories(proveKompiledDir);
-            loader.saveOrDie(proveKompiledDir.resolve("compiled.bin").toFile(), fullCompiledDefinition);
-        } catch (IOException e) {
-            throw KEMException.criticalError(
-                    "Could not create proof output directory " + proveKompiledDir.toAbsolutePath(), e);
-        }
     }
 
     /**

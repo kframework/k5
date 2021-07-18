@@ -55,10 +55,4 @@ public class KProveModule extends AbstractModule {
     SMTOptions smtOptions(KProveOptions options) {
         return options.smt;
     }
-
-    @Provides
-    @Named("extraConcreteRuleLabels")
-    List<String> extraConcreteRuleLabels(KProveOptions options) {
-        return options.extraConcreteRuleLabels;
-    }
 }
