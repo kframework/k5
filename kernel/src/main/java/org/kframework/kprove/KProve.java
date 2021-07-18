@@ -82,7 +82,7 @@ public class KProve {
             }
         }
 
-        RewriterResult results = rewriter.prove(specModule, boundaryPattern);
+        RewriterResult results = rewriter.prove(specModule, boundaryPattern, false);
         kprint.prettyPrint(compiled._1(), compiled._1().getModule("LANGUAGE-PARSING").get(), kprint::outputFile,
                 results.k());
         return results.exitCode().orElse(KEMException.TERMINATED_WITH_ERRORS_EXIT_CODE);

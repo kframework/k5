@@ -118,7 +118,7 @@ public class OcamlRewriter implements Function<Definition, Rewriter> {
             }
 
             @Override
-            public RewriterResult prove(Module rules, Rule boundaryPattern) {
+            public RewriterResult prove(Module rules, Rule boundaryPattern, Boolean reuseDef) {
                 throw new UnsupportedOperationException();
             }
 
