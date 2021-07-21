@@ -98,6 +98,10 @@ public class KompileOptions implements Serializable {
     @Parameter(names="--read-only-kompiled-directory", description="Files in the generated kompiled directory should be read-only to other frontend tools.")
     public boolean readOnlyKompiledDirectory = false;
 
+    @Parameter(names="--concrete-rules", description="List of rule labels to be considered concrete, in addition to " +
+            "rules marked with `[concrete]` attribute")
+    public List<String> extraConcreteRuleLabels = Collections.emptyList();
+
     public boolean isKore() {
         return backend.equals("kore") || backend.equals("haskell") || backend.equals("llvm");
     }
