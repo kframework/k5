@@ -284,6 +284,9 @@ public class Kompile {
         DefinitionTransformer numberSentences = DefinitionTransformer.fromSentenceTransformer(NumberSentences::number, "number sentences uniquely");
         Function1<Definition, Definition> resolveConfigVar = d -> DefinitionTransformer.fromSentenceTransformer(new ResolveFunctionWithConfig(d, false)::resolveConfigVar, "Adding configuration variable to lhs").apply(d);
         Function1<Definition, Definition> resolveIO = (d -> Kompile.resolveIOStreams(kem, d));
+        Function1<Definition, Definition> markExtraConcreteRules = d -> DefinitionTransformer.fromSentenceTransformer((m, s) ->
+                    s instanceof Rule && kompileOptions.extraConcreteRuleLabels.contains(s.att().getOption(Att.LABEL()).getOrElse(() -> null)) ?
+                            Rule.apply(((Rule) s).body(), ((Rule) s).requires(), ((Rule) s).ensures(), s.att().add(Att.CONCRETE())) : s, "mark extra concrete rules").apply(d);
 
         return def -> resolveIO
                 .andThen(resolveFun)
@@ -308,6 +311,7 @@ public class Kompile {
                 .andThen(genCoverage)
                 .andThen(Kompile::addSemanticsModule)
                 .andThen(resolveConfigVar)
+                .andThen(markExtraConcreteRules)
                 .apply(def);
     }
 
@@ -390,6 +394,25 @@ public class Kompile {
             return s;
         }, "rules to claim");
         return mt.apply(specModule);
+    }
+
+    // Extra checks just for the prover specification.
+    public void proverChecksX(Module specModule, Module mainDefModule) {
+        // check rogue syntax in spec module
+        Set<Sentence> toCheck = mutable(specModule.sentences().$minus$minus(mainDefModule.sentences()));
+        for (Sentence s : toCheck)
+            if (s.isSyntax() && (!s.att().contains(Att.TOKEN()) || !mainDefModule.allSorts().contains(((Production) s).sort())))
+                errors.add(KEMException.compilerError("Found syntax declaration in proof module. Only tokens for existing sorts are allowed.", s));
+
+        ModuleTransformer mt = ModuleTransformer.fromSentenceTransformer((m, s) -> {
+            if (m.name().equals(mainDefModule.name()) || mainDefModule.importedModuleNames().contains(m.name()))
+                return s;
+            if (!(s instanceof Claim || s.isSyntax())) {
+                errors.add(KEMException.compilerError("Use claim instead of rule to specify proof objectives.", s));
+            }
+            return s;
+        }, "rules in spec module");
+        mt.apply(specModule);
     }
 
     public void structuralChecks(scala.collection.Set<Module> modules, Module mainModule, Option<Module> kModule, Set<String> excludedModuleTags) {

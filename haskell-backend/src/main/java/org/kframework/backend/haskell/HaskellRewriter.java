@@ -350,10 +350,10 @@ public class HaskellRewriter implements Function<Definition, Rewriter> {
             }
 
             @Override
-            public RewriterResult prove(Module rules, Rule boundaryPattern) {
+            public RewriterResult prove(Module rules, Rule boundaryPattern, Boolean reuseDef) {
                 Module kompiledModule = KoreBackend.getKompiledModule(module);
                 ModuleToKORE converter = new ModuleToKORE(kompiledModule, def.topCellInitializer, kompileOptions);
-                String defPath = saveKoreDefinitionToTemp(converter);
+                String defPath = reuseDef ? files.resolveKompiled("definition.kore").getAbsolutePath() : saveKoreDefinitionToTemp(converter);
                 String specPath = saveKoreSpecToTemp(converter, rules);
                 File koreOutputFile = files.resolveTemp("result.kore");
 

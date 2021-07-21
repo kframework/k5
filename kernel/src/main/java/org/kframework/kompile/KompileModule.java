@@ -6,6 +6,8 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Named;
+import org.kframework.kprove.KProveOptions;
 import org.kframework.main.FrontEnd;
 import org.kframework.main.GlobalOptions;
 import org.kframework.main.Tool;
@@ -17,6 +19,7 @@ import org.kframework.utils.inject.RequestScoped;
 import org.kframework.utils.options.OuterParsingOptions;
 import org.kframework.utils.options.SMTOptions;
 
+import java.util.List;
 import java.util.Map;
 
 public class KompileModule extends AbstractModule {
@@ -49,4 +52,9 @@ public class KompileModule extends AbstractModule {
     @Provides
     OuterParsingOptions outerParsingOptions(KompileOptions options) { return options.outerParsing; }
 
+    @Provides
+    @Named("extraConcreteRuleLabels")
+    List<String> extraConcreteRuleLabels(KProveOptions options) {
+        return options.extraConcreteRuleLabels;
+    }
 }

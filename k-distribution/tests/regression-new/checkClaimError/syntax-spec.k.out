@@ -1,0 +1,7 @@
+[Error] Compiler: Found syntax declaration in proof module. Only tokens for existing sorts are allowed.
+	Source(syntax-spec.k)
+	Location(6,18,6,28)
+[Error] Compiler: Found syntax declaration in proof module. Only tokens for existing sorts are allowed.
+	Source(syntax-spec.k)
+	Location(7,5,7,12)
+[Error] Compiler: Had 2 structural errors.
