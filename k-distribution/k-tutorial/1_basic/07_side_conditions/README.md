@@ -6,7 +6,7 @@ and to explain how to control the order in which rules are tried.
 ## Side Conditions
 
 So far, all of the rules we have discussed have been **unconditional rules**.
-If the left hand side of the rule matches the arguments to the function, the
+If the left-hand side of the rule matches the arguments to the function, the
 rule applies. However, there is another type of rule, a **conditional rule**.
 A conditional rule consists of a **rule body** containing the patterns to
 match, and a **side condition** representing a Boolean expression that must
@@ -35,13 +35,13 @@ endmodule
 In this case, the `gradeFromPercentile` function takes a single integer
 argument. The function evaluates to `letter-A` if the argument passed is
 greater than 90. Note that the side condition is allowed to refer to variables
-that appear on the left-hand-side of the rule. In the same manner as variables
-appearing on the right-hand-side, variables that appear in the side condition
-evaluate to the value that was matched on the left hand side. Then the
+that appear on the left-hand side of the rule. In the same manner as variables
+appearing on the right-hand side, variables that appear in the side condition
+evaluate to the value that was matched on the left-hand side. Then the
 functions in the side condition are evaluated, which returns a term of sort
 `Bool`. If the term is equal to `true`, then the rule applies. Bear in mind
 that the side condition is only evaluated at all if the patterns on the
-left-hand-side of the rule match the term being evaluated.
+left-hand side of the rule match the term being evaluated.
 
 ### Exercise
 
@@ -58,7 +58,7 @@ immediately clear why this choice was made, given that a function is not
 considered well-defined if multiple rules for evaluating it are capable of
 evaluating the same arguments to different results. However, in future lessons
 we will discuss other types of rules in K, some of which can be
-**nondeterministic**. What this means is that if more than one rule is capable
+**non-deterministic**. What this means is that if more than one rule is capable
 of matching, then K will explore both possible rules in parallel, and consider
 each of their respective results when executing your program. Don't worry too
 much about this right now, but just understand that because of the potential
@@ -100,8 +100,8 @@ B if the percentile is greater than or equal to 80." Note here that we use both
 a side condition and an `owise` attribute on the same rule. This is not
 required (as we will see later), but it is allowed. What this means is that the
 side condition is only tried if the other rules did not apply **and** the 
-left-hand-side of the rule matched. You can even use more complex matching on
-the left-hand-side than simply a variable. More generally, you can also have
+left-hand side of the rule matched. You can even use more complex matching on
+the left-hand side than simply a variable. More generally, you can also have
 multiple higher-priority rules, or multiple `owise` rules. What this means in
 practice is that all of the non-`owise` rules are tried first, in any order,
 followed by all the `owise` rules, in any order.
@@ -173,7 +173,7 @@ endmodule
 
 Note that we have introduced a new piece of syntax here: `_`. This is actually
 just a variable. However, as a special case, when a variable is named `_`, it
-does not bind a value that can be used on the right hand side of the rule, or
+does not bind a value that can be used on the right-hand side of the rule, or
 in a side condition. Effectively, `_` is a placeholder variable that means "I
 don't care about this term."
 
@@ -190,7 +190,7 @@ explicit priority.
 ## Exercises
 
 1. Write a function `isEven` that returns whether an integer is an even number.
-Use two rules and one side condition. The right hand side of the rules should
+Use two rules and one side condition. The right-hand side of the rules should
 be Boolean literals. Refer back to
 [domains.md](../../../include/kframework/builtin/domains.md) for the relevant
 integer operations.

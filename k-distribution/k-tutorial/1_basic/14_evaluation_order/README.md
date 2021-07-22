@@ -15,7 +15,7 @@ of the expression is a value.
 
 However, K has built-in support for deciding when to heat and when to cool.
 This support comes in the form of the rule attributes `heat` and `cool` as
-well as the builtin function `isKResult`.
+well as the specially named function `isKResult`.
 
 Consider the following definition, which is equivalent to `LESSON-13-C`
 (`lesson-14-a.k`):
@@ -222,7 +222,7 @@ Finally, note that there are a few minor syntactic conveniences provided by the
 exactly like `<k> HERE ...</k>`, you can omit both the `context alias` sentence
 from the definition, and the name from the `seqstrict` attribute.
 
-Second, if the numbered list of offsets contains every nonterminal in the
+Second, if the numbered list of offsets contains every non-terminal in the
 production, it can be omitted from the attribute value.
 
 Thus, we can finally produce the idiomatic K definition for this example
@@ -265,14 +265,14 @@ Thus far, we have focused entirely on deterministic evaluation order. However,
 not all languages are deterministic in the order they evaluate expressions.
 For example, in C, the expression `a() + b() + c()` is guaranteed to parse
 to `(a() + b()) + c()`, but it is not guaranteed that `a` will be called before
-`b` before `c`. In fact, this evaluation order is nondeterministic.
+`b` before `c`. In fact, this evaluation order is non-deterministic.
 
-We can express nondeterministic evaluation orders with the `strict` attribute.
+We can express non-deterministic evaluation orders with the `strict` attribute.
 Its behavior is identical to the `seqstrict` attribute, except that step 3 in
 the above list (with the side condition automatically added) does not take
-place. In other words, if I wrote `syntax Exp ::= Exp "+" Exp [strict]` instead
-of `syntax Exp ::= Exp "+" Exp [seqstrict]`, it would generate the following
-two contexts instead of the ones found in `LESSON-14-B`:
+place. In other words, if we wrote `syntax Exp ::= Exp "+" Exp [strict]`
+instead of `syntax Exp ::= Exp "+" Exp [seqstrict]`, it would generate the
+following two contexts instead of the ones found in `LESSON-14-B`:
 
 ```
   context <k> _:Exp + HOLE:Exp ...</k>

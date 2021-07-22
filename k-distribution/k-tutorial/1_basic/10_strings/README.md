@@ -18,18 +18,15 @@ supported:
 
 | Escape Sequence | Meaning                                                   |
 | --------------- | --------------------------------------------------------- |
-| \"              | The literal character "                                   |
-| \\              | The literal character \                                   |
-| \n              | The newline character (ASCII code 0x0a)                   |
-| \r              | The carriage return character (ASCII code 0x0d)           |
-| \t              | The tab character (ASCII code 0x09)                       |
-| \f              | The form feed character (ASCII code 0x0c)                 |
-| \x00            | \x followed by 2 hexadecimal digits indicates a code point
-                    between 0x00 and 0xFF                                     |
-| \u0000          | \u followed by 4 hexadecimal digits indicates a code point
-                    between 0x0000 and 0xFFFF                                 |
-| \U00000000      | \U followed by 8 hexadecimal digits indicates a code point
-                    between 0x0000 and 0x10FFFF                               |
+| `\"`            | The literal character "                                   |
+| `\\`            | The literal character \                                   |
+| `\n`            | The newline character (ASCII code 0x0a)                   |
+| `\r`            | The carriage return character (ASCII code 0x0d)           |
+| `\t`            | The tab character (ASCII code 0x09)                       |
+| `\f`            | The form feed character (ASCII code 0x0c)                 |
+| `\x00`          | \x followed by 2 hexadecimal digits indicates a code point between 0x00 and 0xFF |
+| `\u0000`        | \u followed by 4 hexadecimal digits indicates a code point between 0x0000 and 0xFFFF |
+| `\U00000000`    | \U followed by 8 hexadecimal digits indicates a code point between 0x000000 and 0x10FFFF |
 
 Please note that as of the current moment, K's unicode support is not fully
 complete, so you may run into errors using code points greater than 0xff.

@@ -40,7 +40,7 @@ defined a sort `Exp`, the actual production for that sort would be:
 At runtime, this expression will not actually exist; it is merely an annotation
 to the compiler describing the sort of the term inside the cast. It is telling
 the compiler that the term inside the cast must be of sort `Exp`. For example,
-if I had the following grammar:
+if we had the following grammar:
 
 ```k
 module LESSON-11-A
@@ -96,7 +96,7 @@ endmodule
 ```
 
 This grammar is a little ambiguous and contrived, but it serves to demonstrate
-how a semantic cast might be insufficient to disambiguate a term. If I were 
+how a semantic cast might be insufficient to disambiguate a term. If we were 
 to write the term `(I1:Int + I2:Int):Exp2`, the term would be ambiguous,
 because the cast is not sufficiently strict to determine whether you mean
 to derive the "+" production tagged `exp`, or the one tagged `exp2`.
@@ -125,19 +125,23 @@ should be chosen, whereas if we want the second derivation, we could write
 Write a function `eval` which takes a term of sort `Exp2` and returns an `Int`.
 The function should be capable of evaluating any term of sort `Exp2` to the
 integer value which it expresses. You will need to write strict casts in order
-to disambiguate these rules.
+to disambiguate these rules. You will not be able to directly write terms of
+sort Exp2 directly in a program, so you will have to create new function
+symbols that rewrite constant symbols to terms of sort Exp2 and use strict
+casts to disambiguate their right-hand side.
 
 ### Projection casts
 
-Sometimes, when dealing with grammars containing subsorts, it can be desirable
-to reason with the subsort production itself, which **injects** one sort into
-another. Remember from above that such a production looks like
-`syntax S ::= S2`. This type of production, called a **subsort production**,
-can be thought of as a type of inheritance involving constructors. If we have
-the above production in our grammar, we say that `S2` is a subsort of `S`,
-or that any `S2` is also an `S`. K implicitly maintains a symbol at runtime
-which keeps track of where such subsortings occur; this symbol is called
-an **injection**.
+Thus far we have focused entirely on casts which exist solely to inform the 
+compiler about the sort of terms. However, sometimes when dealing with grammars
+containing subsorts, it can be desirable to reason with the subsort production
+itself, which **injects** one sort into another. Remember from above that such
+a production looks like `syntax S ::= S2`. This type of production, called a
+**subsort production**, can be thought of as a type of inheritance involving
+constructors. If we have the above production in our grammar, we say that `S2`
+is a subsort of `S`, or that any `S2` is also an `S`. K implicitly maintains a
+symbol at runtime which keeps track of where such subsortings occur; this
+symbol is called an **injection**.
 
 Sometimes, when one sort is a subsort of another, it can be the case that
 a function returns one sort, but you actually want to cast the result of 
@@ -157,7 +161,9 @@ For each pair of sorts `S` and `S2`, K provides the following production:
 What this means is that you take any term of sort `S2` and **cast** it to sort
 `S`. If the term of sort S2 consists of an injection containing a term of sort
 `S`, then this will return that term. Otherwise, an error occurs and rewriting
-fails, returning the projection function which failed to apply.
+fails, returning the projection function which failed to apply. The sort is
+not actually checked at compilation time; rather, it a runtime check is
+inserted into the code that runs when the rule applies.
 
 For example, here is an example that makes use of projection casts:
 

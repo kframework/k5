@@ -203,33 +203,39 @@ string.
 Provided for reference is a table with a complete list of all valid format
 codes, followed by their meaning:
 
-| Format Code | Meaning                                                       |
-| ----------- | ------------------------------------------------------------- |
-| n           | Insert '\n' followed by the current indentation level        |
-| i           | Increase the current indentation level by 1                   |
-| d           | Decrease the current indentation level by 1                   |
-| c           | Move to the next color in the list of colors for this
-                production (see next section)                                 |
-| r           | Reset color to the default foreground color for the terminal
-                (see next section)                                            |
-| an integer  | Print a terminal or non-terminal from the production. The
-                integer is treated as a 1-based index into the terminals and
-                non-terminals of the production.
-
-                If the offset refers to a terminal, move to the next color in
-                the list of colors for this production, print the value of
-                that terminal, then reset the color to the default foreground
-                color for the terminal.
-
-                If the offset refers to a regular expression terminal, it is
-                an error.
-
-                If the offset refers to a non-terminal, unparse the
-                corresponding child of the current term (starting with the
-                current indentation level) and print the resulting text, then
-                set the current color and indentation level to the color and
-                indentation level following unparsing that term.              |
-| other char  | Print that character verbatim                                 |
+<table>
+<tr><th> Format Code </th><th> Meaning                                          </th></tr>
+<tr><td> n           </td><td> Insert '\n' followed by the current indentation
+                               level                                            </td></tr>
+<tr><td> i           </td><td> Increase the current indentation level by 1      </td></tr>
+<tr><td> d           </td><td> Decrease the current indentation level by 1      </td></tr>
+<tr><td> c           </td><td> Move to the next color in the list of colors for
+                               this production (see next section)               </td></tr>
+<tr><td> r           </td><td> Reset color to the default foreground color for
+                               the terminal (see next section)                  </td></tr>
+<tr><td> an integer  </td><td> Print a terminal or non-terminal from the
+                               production. The integer is treated as a 1-based
+                               index into the terminals and non-terminals of
+                               the production.
+<br/>
+<br/>                          If the offset refers to a terminal, move to the
+                               next color in the list of colors for this
+                               production, print the value of that terminal,
+                               then reset the color to the default foreground
+                               color for the terminal.
+<br/>
+<br/>                          If the offset refers to a regular expression
+                               terminal, it is an error.
+<br/>
+<br/>                          If the offset refers to a non-terminal, unparse
+                               the corresponding child of the current term
+                               (starting with the current indentation level)
+                               and print the resulting text, then set the
+                               current color and indentation level to the color
+                               and indentation level following unparsing that
+                               term.                                            </td></tr>
+<tr><td> other char  </td><td> Print that character verbatim                    </td></tr>
+</table>
 
 ### Exercise
 
@@ -279,6 +285,29 @@ production. At a more advanced level, the `%c` and `%r` format codes control
 how the formatter interacts with the list of colors specified by the `colors`
 attribute. You can essentially think of the `color` attribute as a way of
 specifying that you want all the colors in the list to be the same color.
+
+For example, here is a variant of LESSON-09-A which colors the various boolean
+operators:
+
+```k
+module LESSON-09-D
+  imports BOOL
+
+  syntax Exp ::= "(" Exp ")" [bracket]
+               | Bool
+               > "!" Exp [color(yellow)]
+               > left:
+                 Exp "&&" Exp [color(red)]
+               | Exp "^" Exp [color(blue)]
+               | Exp "||" Exp [color(green)]
+
+  syntax Exp ::= id(Exp) [function]
+  rule id(E) => E
+endmodule
+```
+
+For a complete list of allowed colors, see 
+[here](https://github.com/kframework/llvm-backend/blob/master/lib/ast/AST.cpp#L381).
 
 ## Exercises
 
