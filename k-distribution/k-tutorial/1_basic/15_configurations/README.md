@@ -241,3 +241,8 @@ value of the Boolean flag. Then add another production
 `syntax Stmt ::= "reset" ";" Exp` which sets the value of the Boolean flag back
 to its default value via a `...` on the right-hand-side. You will need to add
 an additional cell around the Boolean cell to make this work.
+
+## Next lesson
+
+Once you have completed the above exercises, you can continue to
+[Lesson 1.16: Maps, Semantic Lists, and Sets](../16_collections/README.md).
